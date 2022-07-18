@@ -18,13 +18,13 @@ integer count;
 integer bitshift=0;
 
 task maximum_ABC(
-output reg d,
+output d,
 input a,
 input b,
 input c
 );
 begin
-    d=(a&c)|(a&b)|(b&d);
+    d=(a&c)|(a&b)|(b&c);
 end
 endtask
 
@@ -40,43 +40,44 @@ begin
         end
         hardware_key=hardware_key>>1;
         hardware_key[63]=hkey;
-        $display("Values loaded");
+        $display("Hardware Key : %b",hardware_key[63:40]);
         
         reg1=hardware_key[18:0];
-        reg2=hardware_key[40:19];
-        reg3=hardware_key[63:41];
+        reg2=hardware_key[40:18];
+        reg3=hardware_key[62:39];
         
-        $display("registers loaded ");
+        $display("%b : %b : %b",reg1,reg2,reg3);
         
         //initialise loop here
         for(count=0;count<524288;count=count+1)
         begin
             @(posedge clk)
             begin
-            maximum_ABC(max,reg1[8],reg2[10],reg3[10]);
-            xor1=reg1[13]^reg1[16]^reg1[17]^reg1[18];
-            xor2=reg2[20]^reg2[21];
-            xor3=reg1[7]^reg1[20]^reg1[21]^reg1[22];
-            if(max==reg1[8])
+            maximum_ABC(max,reg1[10],reg2[11],reg3[12]);
+            xor1=reg1[5]^reg1[2]^reg1[1]^reg1[0];
+            xor2=reg2[1]^reg2[0];
+            xor3=reg3[15]^reg3[2]^reg3[1]^reg3[20];
+            if(max==reg1[10])
             begin
-                reg1=reg1<<1;
-                reg1[0]=xor1;
+                reg1=reg1>>1;
+                reg1[18]=xor1;
             end
             
-            if(max==reg2[10])
+            if(max==reg2[11])
             begin
-                reg2=reg2<<1;
-                reg2[0]=xor2;
+                reg2=reg2>>1;
+                reg2[21]=xor2;
             end
             
-            if(max==reg3[10])
+            if(max==reg3[12])
             begin
-                reg3=reg3<<1;
-                reg3[0]=xor3;
+                reg3=reg3>>1;
+                reg3[22]=xor3;
             end
             encryptedkey=reg1[0]^reg2[0]^reg3[0];
             key=encryptedkey;
-            $display("%b : %b : %b ",reg1,reg2,reg3);
+            
+            $display("%b",encryptedkey);
             // temporary_outbyte[bitshift]=encryptedkey^inbyte[bitshift];
             // bitshift=bitshift+1;
             // if(bitshift==8)
